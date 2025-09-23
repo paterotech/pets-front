@@ -4,8 +4,11 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { useMemo } from 'react';
+import { useLoader } from '@/app/context/LoaderContext';
 
 export default function Navbar() {
+
+    const { showLoader, hideLoader } = useLoader();
 
     const itemsNav = useMemo(
     () => [
@@ -18,6 +21,13 @@ export default function Navbar() {
       ],
     []
   );
+
+  const handleClick = () => {
+    showLoader();
+    setTimeout(() => {
+      hideLoader();
+    }, 3000);
+  };
 
   return (
     <nav className="w-full bg-[#fdfdfb] shadow-sm">
@@ -47,6 +57,7 @@ export default function Navbar() {
                     key={item.id} 
                     href={item.href} 
                     className="hover:text-[#3DD9D6]"
+                    onClick={handleClick}
                 >
                   <span className='text-sm md:text-base'>
                     {item.name}
