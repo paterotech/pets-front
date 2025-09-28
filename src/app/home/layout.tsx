@@ -8,8 +8,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <Navbar/>
-        {children}
+        <Navbar />
+        <main className="pt-24"> {/* Ajusta el valor según la altura real de tu navbar */}
+          {children}
+        </main>
       </body>
     </html>
   );

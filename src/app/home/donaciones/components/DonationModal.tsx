@@ -1,12 +1,12 @@
-// components/DonationModal.tsx
 'use client';
 import { useEffect, useState } from 'react';
+import { CreditCard, Calendar, User, Shield } from 'lucide-react';
 
 type Props = {
   isOpen: boolean;
   onClose: () => void;
-  amount?: number; // monto opcional a mostrar
-  onSuccess?: (data: any) => void; // callback si quieres manejar respuesta del servidor
+  amount?: number;
+  onSuccess?: (data: any) => void;
 };
 
 export default function DonationModal({ isOpen, onClose, amount, onSuccess }: Props) {
@@ -19,7 +19,6 @@ export default function DonationModal({ isOpen, onClose, amount, onSuccess }: Pr
 
   useEffect(() => {
     if (!isOpen) {
-      // reset cuando se cierra
       setCardNumber('');
       setExpiry('');
       setCvc('');
@@ -31,8 +30,7 @@ export default function DonationModal({ isOpen, onClose, amount, onSuccess }: Pr
 
   // --- Helpers de formato y validación ---
   const formatCardNumber = (value: string) => {
-    const digits = value.replace(/\D/g, '').slice(0, 19); // 19 por tarjetas (some 19)
-    // agrupar en 4s
+    const digits = value.replace(/\D/g, '').slice(0, 19);
     return digits.replace(/(.{4})/g, '$1 ').trim();
   };
 
@@ -55,7 +53,7 @@ export default function DonationModal({ isOpen, onClose, amount, onSuccess }: Pr
       sum += digit;
       shouldDouble = !shouldDouble;
     }
-    return sum % 10 === 0 && digits.length >= 12; // valida longitud mínima
+    return sum % 10 === 0 && digits.length >= 12;
   };
 
   const validExpiry = (value: string) => {
@@ -65,9 +63,8 @@ export default function DonationModal({ isOpen, onClose, amount, onSuccess }: Pr
     const yy = parseInt(m[1], 10);
     if (isNaN(mm) || isNaN(yy)) return false;
     if (mm < 1 || mm > 12) return false;
-    // asumir formato YY
     const now = new Date();
-    const currentYear = now.getFullYear() % 100; // YY
+    const currentYear = now.getFullYear() % 100;
     const currentMonth = now.getMonth() + 1;
     if (yy < currentYear) return false;
     if (yy === currentYear && mm < currentMonth) return false;
@@ -79,7 +76,6 @@ export default function DonationModal({ isOpen, onClose, amount, onSuccess }: Pr
     return d.length >= 3 && d.length <= 4;
   };
 
-  // --- Submit ---
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
@@ -105,13 +101,6 @@ export default function DonationModal({ isOpen, onClose, amount, onSuccess }: Pr
     setLoading(true);
 
     try {
-      // Aquí deberías:
-      // 1) Enviar los datos a tu backend que llame al proveedor de pagos (Stripe, PayU, etc.)
-      // 2) O tokenizar con el SDK del proveedor en cliente y enviar token al backend.
-      // Por seguridad NUNCA enviar raw card + cvc directamente a tu servidor sin TLS y sin
-      // cumplir normas PCI si no usas un proveedor (mejor tokenizar en cliente).
-
-      // Ejemplo simulando petición:
       const resp = await fetch('/api/donate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -129,7 +118,6 @@ export default function DonationModal({ isOpen, onClose, amount, onSuccess }: Pr
       if (!resp.ok) {
         setError(data?.message || 'Error procesando el pago');
       } else {
-        // éxito
         if (onSuccess) onSuccess(data);
         onClose();
       }
@@ -151,95 +139,111 @@ export default function DonationModal({ isOpen, onClose, amount, onSuccess }: Pr
     >
       {/* Overlay */}
       <div
-        className="absolute inset-0 bg-black/40"
+        className="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity"
         onClick={() => !loading && onClose()}
       />
 
       {/* Modal */}
-      <div className="relative w-full max-w-md mx-4 bg-white rounded-lg shadow-xl z-10">
-        <form onSubmit={handleSubmit} className="p-6">
-          <div className="flex items-start justify-between">
+      <div className="relative w-full max-w-md mx-4 bg-white rounded-2xl shadow-2xl z-10 animate-fade-in">
+        <form onSubmit={handleSubmit} className="p-7">
+          <div className="flex items-start justify-between mb-2">
             <div>
-              <h3 id="donation-modal-title" className="text-lg font-semibold text-[#2d2d2d]">
+              <h3 id="donation-modal-title" className="text-xl font-bold text-[#2d2d2d]">
                 Donar {amount ? `- $${amount}` : ''}
               </h3>
-              <p className="text-sm text-gray-600">Ingresa los datos de tu tarjeta</p>
+              <p className="text-sm text-gray-500">Ingresa los datos de tu tarjeta</p>
             </div>
             <button
               type="button"
-              className="text-gray-400 hover:text-gray-600"
+              className="text-gray-400 hover:text-[#3DD9D6] text-2xl font-bold transition"
               onClick={() => !loading && onClose()}
               aria-label="Cerrar"
             >
-              ✕
+              ×
             </button>
           </div>
 
-          <div className="mt-4 space-y-3">
-            <div>
+          <div className="mt-4 space-y-4">
+            <div className="relative">
               <label className="block text-sm font-medium text-gray-700">Número de tarjeta</label>
+              <span className="absolute left-3 top-10 text-[#3DD9D6]">
+                <CreditCard size={20} />
+              </span>
               <input
                 inputMode="numeric"
                 autoComplete="cc-number"
                 value={cardNumber}
                 onChange={(e) => setCardNumber(formatCardNumber(e.target.value))}
                 placeholder="1234 1234 1234 1234"
-                className="mt-1 block w-full p-3 border text-gray-900 border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-[#3DD9D6]"
+                className="mt-1 block w-full p-3 pl-10 border text-gray-900 border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-[#3DD9D6] transition"
                 required
                 maxLength={23}
               />
             </div>
 
             <div className="flex gap-3">
-              <div className="flex-1">
+              <div className="flex-1 relative">
                 <label className="block text-sm font-medium text-gray-700">Expiración (MM/YY)</label>
+                <span className="absolute left-3 top-10 text-[#3DD9D6]">
+                  <Calendar size={20} />
+                </span>
                 <input
                   inputMode="numeric"
                   autoComplete="cc-exp"
                   value={expiry}
                   onChange={(e) => setExpiry(formatExpiry(e.target.value))}
                   placeholder="MM/YY"
-                  className="mt-1 block w-full p-3 border text-gray-900 border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-[#3DD9D6]"
+                  className="mt-1 block w-full p-3 pl-10 border text-gray-900 border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-[#3DD9D6] transition"
                   required
                   maxLength={5}
                 />
               </div>
 
-              <div style={{ width: '110px' }}>
+              <div className="w-[110px] relative">
                 <label className="block text-sm font-medium text-gray-700">CVC</label>
+                <span className="absolute left-3 top-10 text-[#3DD9D6]">
+                  <Shield size={20} />
+                </span>
                 <input
                   inputMode="numeric"
                   autoComplete="cc-csc"
                   value={cvc}
                   onChange={(e) => setCvc(e.target.value.replace(/\D/g, '').slice(0, 4))}
                   placeholder="123"
-                  className="mt-1 block w-full p-3 border text-gray-900 border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-[#3DD9D6]"
+                  className="mt-1 block w-full p-3 pl-10 border text-gray-900 border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-[#3DD9D6] transition"
                   required
                   maxLength={4}
                 />
               </div>
             </div>
 
-            <div>
+            <div className="relative">
               <label className="block text-sm font-medium text-gray-700">Nombre en la tarjeta</label>
+              <span className="absolute left-3 top-10 text-[#3DD9D6]">
+                <User size={20} />
+              </span>
               <input
                 autoComplete="cc-name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="Ej: Juan Pérez"
-                className="mt-1 block w-full p-3 border text-gray-900 border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-[#3DD9D6]"
+                className="mt-1 block w-full p-3 pl-10 border text-gray-900 border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-[#3DD9D6] transition"
                 required
               />
             </div>
 
-            {error && <p className="text-sm text-[#E63946]">{error}</p>}
+            {error && (
+              <p className="text-sm text-[#E63946] bg-[#ffeaea] border border-[#E63946] rounded-md px-3 py-2 mt-2 animate-fade-in">
+                {error}
+              </p>
+            )}
           </div>
 
-          <div className="mt-6 flex items-center justify-end gap-3">
+          <div className="mt-7 flex items-center justify-end gap-3">
             <button
               type="button"
               onClick={() => !loading && onClose()}
-              className="px-4 py-2 rounded-md border border-gray-200 text-gray-700 hover:bg-gray-50"
+              className="px-4 py-2 rounded-md border border-gray-200 text-gray-700 hover:bg-gray-50 transition"
               disabled={loading}
             >
               Cancelar
@@ -248,15 +252,30 @@ export default function DonationModal({ isOpen, onClose, amount, onSuccess }: Pr
             <button
               type="submit"
               disabled={loading}
-              className={`px-4 py-2 rounded-md font-semibold text-white ${
-                loading ? 'bg-gray-400' : 'bg-[#3DD9D6] hover:bg-[#2BB2B0]'
+              className={`px-4 py-2 rounded-md font-semibold text-white flex items-center gap-2 transition ${
+                loading ? 'bg-gray-400 cursor-not-allowed' : 'bg-[#3DD9D6] hover:bg-[#2BB2B0]'
               }`}
             >
+              {loading && (
+                <svg className="animate-spin h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
+                </svg>
+              )}
               {loading ? 'Procesando...' : `Donar${amount ? ` $${amount}` : ''}`}
             </button>
           </div>
         </form>
       </div>
+      <style jsx global>{`
+        .animate-fade-in {
+          animation: fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        @keyframes fadeIn {
+          from { opacity: 0; transform: scale(0.97);}
+          to { opacity: 1; transform: scale(1);}
+        }
+      `}</style>
     </div>
   );
 }
