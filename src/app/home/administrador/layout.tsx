@@ -8,7 +8,7 @@ export default function Adminsitrador({
     <html lang="en">
       <body>
         {/* <Navbar /> */}
-        <main className="pt-24">
+        <main className="">
           {children}
         </main>
       </body>
