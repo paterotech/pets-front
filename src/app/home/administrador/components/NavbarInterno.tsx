@@ -3,6 +3,7 @@ export default function NavbarInterno({ current, setCurrent }: { current: string
     { key: 'inicio', label: 'Inicio' },
     { key: 'peluditos', label: 'Peluditos' },
     { key: 'solicitudes', label: 'Solicitudes de Adopción' },
+    { key: 'blogs', label: 'Blogs' },
   ];
   return (
     <nav className="flex gap-2 md:gap-4 border-b border-[#3DD9D6] mb-8 bg-white/80 rounded-t-xl shadow-sm px-2 py-1">

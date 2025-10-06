@@ -3,6 +3,7 @@ import { useState } from "react";
 import CrudPeluditos from "./peluditos/page";
 import SolicitudesAdopcion from "./adopciones/page";
 import Dashboard from "./dashboard/page";
+import CrudBlogs from "./blogs/page";
 import NavbarInterno from "./components/NavbarInterno";
 
 export default function AdministradorPage() {
@@ -14,6 +15,7 @@ export default function AdministradorPage() {
         <NavbarInterno current={current} setCurrent={setCurrent} />
         {current === 'inicio' && <Dashboard />}
         {current === 'peluditos' && <CrudPeluditos />}
+        {current === 'blogs' && <CrudBlogs />}
         {current === 'solicitudes' && <SolicitudesAdopcion />}
       </div>
     </div>
